@@ -27,6 +27,8 @@ public class VendorMenuManagePage extends BasePage {
     private final By validationMessages = By.cssSelector("#menu-item-form [id$='-error']");
     private final By deleteButton = By.cssSelector("btn-danger");
     private final By formErrorMsg = By.id("menu-item-name-error");
+    private final By menuEditButton = By.id("menu-manage-item-edit-btn-1");
+    private final By menuEditConfButton = By.id("menu-item-form-submit-btn");
 
     public VendorMenuManagePage(WebDriver driver) {
         super(driver);
@@ -38,6 +40,14 @@ public class VendorMenuManagePage extends BasePage {
 
     public boolean isDisplayed() {
         return isDisplayed(page);
+    }
+
+    public void clickMenuEdit(){
+        click(menuEditButton);
+    }
+
+    public void menuEditConfButton(){
+        click(menuEditConfButton);
     }
 
     public boolean hasMenuManagementState() {
@@ -225,5 +235,12 @@ public class VendorMenuManagePage extends BasePage {
 
     private static String normalize(String value) {
         return value == null ? "" : value.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
+    }
+
+    public boolean verifyLoginUrl(String currentUrl) {
+        if (currentUrl == null) {
+            return false;
+        }
+        return currentUrl.contains("/login");
     }
 }

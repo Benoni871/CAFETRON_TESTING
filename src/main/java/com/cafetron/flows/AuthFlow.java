@@ -27,6 +27,7 @@ public class AuthFlow {
         return user;
     }
 
+
     public void logoutEmployeeFromMenuIfPossible() {
         try {
             new com.cafetron.pages.MenuPage(driver).logout();

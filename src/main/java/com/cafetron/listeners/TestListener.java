@@ -13,24 +13,37 @@ import org.testng.ITestResult;
 
 public class TestListener implements ITestListener {
     private static final ThreadLocal<ExtentTest> TEST = new ThreadLocal<>();
+    private static final String EXTENT_TEST_ATTRIBUTE = TestListener.class.getName() + ".extentTest";
+    private static final String EXTENT_TEST_REPORTED_ATTRIBUTE = TestListener.class.getName() + ".reported";
 
     @Override
     public void onTestStart(ITestResult result) {
-        ExtentTest extentTest = ExtentReportManager.getExtentReports()
-                .createTest(result.getMethod().getMethodName())
-                .assignCategory(result.getTestClass().getName());
-        TEST.set(extentTest);
+        TEST.set(getOrCreateExtentTest(result));
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        TEST.get().log(Status.PASS, "Test passed");
+        ExtentTest extentTest = getOrCreateExtentTest(result);
+        if (markReported(result)) {
+            extentTest.log(Status.PASS, "Test passed");
+            ExtentReportManager.flushReports();
+        }
+        TEST.remove();
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        ExtentTest extentTest = TEST.get();
-        extentTest.fail(result.getThrowable());
+        ExtentTest extentTest = getOrCreateExtentTest(result);
+        if (!markReported(result)) {
+            TEST.remove();
+            return;
+        }
+
+        if (result.getThrowable() != null) {
+            extentTest.fail(result.getThrowable());
+        } else {
+            extentTest.fail("Test failed");
+        }
 
         try {
             String screenshotPath = getExistingScreenshotPath(result);
@@ -48,17 +61,59 @@ public class TestListener implements ITestListener {
         } catch (RuntimeException exception) {
             extentTest.warning("Screenshot capture failed: " + exception.getMessage());
         }
+
+        ExtentReportManager.flushReports();
+        TEST.remove();
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        TEST.get().log(Status.SKIP, "Test skipped");
+        ExtentTest extentTest = getOrCreateExtentTest(result);
+        if (markReported(result)) {
+            extentTest.log(Status.SKIP, "Test skipped");
+            if (result.getThrowable() != null) {
+                extentTest.skip(result.getThrowable());
+            }
+            ExtentReportManager.flushReports();
+        }
+        TEST.remove();
     }
 
     @Override
     public void onFinish(ITestContext context) {
-        ExtentReportManager.getExtentReports().flush();
+        ExtentReportManager.flushReports();
         TEST.remove();
+    }
+
+    private ExtentTest getOrCreateExtentTest(ITestResult result) {
+        Object existingTest = result.getAttribute(EXTENT_TEST_ATTRIBUTE);
+        if (existingTest instanceof ExtentTest) {
+            return (ExtentTest) existingTest;
+        }
+
+        synchronized (result) {
+            existingTest = result.getAttribute(EXTENT_TEST_ATTRIBUTE);
+            if (existingTest instanceof ExtentTest) {
+                return (ExtentTest) existingTest;
+            }
+
+            ExtentTest extentTest = ExtentReportManager.getExtentReports()
+                    .createTest(result.getMethod().getMethodName())
+                    .assignCategory(result.getTestClass().getName());
+            result.setAttribute(EXTENT_TEST_ATTRIBUTE, extentTest);
+            TEST.set(extentTest);
+            return extentTest;
+        }
+    }
+
+    private boolean markReported(ITestResult result) {
+        synchronized (result) {
+            if (Boolean.TRUE.equals(result.getAttribute(EXTENT_TEST_REPORTED_ATTRIBUTE))) {
+                return false;
+            }
+            result.setAttribute(EXTENT_TEST_REPORTED_ATTRIBUTE, Boolean.TRUE);
+            return true;
+        }
     }
 
     private WebDriver getDriverFromResult(ITestResult result) {

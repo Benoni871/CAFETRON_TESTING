@@ -41,6 +41,31 @@ public class AdminOperationsPage extends BasePage {
         click(toggleButton);
     }
 
+    public void setCutoffTime(String cutoffTime) {
+        type(cutoffInput, cutoffTime);
+        click(cutoffSaveButton);
+    }
+
+    public void closeOrderingWindowIfOpen() {
+        if (!isOrderingWindowClosed()) {
+            toggleOrderingWindow();
+            wait.until(driver -> isOrderingWindowClosed() || hasFeedback());
+        }
+    }
+
+    public boolean isOrderingWindowClosed() {
+        String stateText = getOptionalText(windowState).toLowerCase();
+        return stateText.contains("closed") || stateText.contains("disabled") || stateText.contains("not allowed");
+    }
+
+    public String orderingAllowedText() {
+        return getOptionalText(tableOrderingAllowed);
+    }
+
+    public boolean isOrderingAllowedNo() {
+        return "No".equalsIgnoreCase(orderingAllowedText());
+    }
+
     public boolean hasFeedback() {
         return isDisplayed(toast);
     }

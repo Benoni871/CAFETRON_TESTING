@@ -21,9 +21,19 @@ public final class ExtentReportManager {
         return extentReports;
     }
 
+    public static Path getReportDirectory() {
+        return REPORT_PATH.getParent();
+    }
+
+    public static synchronized void flushReports() {
+        if (extentReports != null) {
+            extentReports.flush();
+        }
+    }
+
     private static void createReport() {
         try {
-            Files.createDirectories(REPORT_PATH.getParent());
+            Files.createDirectories(getReportDirectory());
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to create report directory", exception);
         }

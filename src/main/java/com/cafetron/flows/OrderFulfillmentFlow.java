@@ -1,7 +1,7 @@
 package com.cafetron.flows;
 
 import com.cafetron.data.Role;
-import com.cafetron.pages.VendorOrdersPage;
+import com.cafetron.pages.VendorQueuePage;
 import org.openqa.selenium.WebDriver;
 
 public class OrderFulfillmentFlow {
@@ -13,8 +13,8 @@ public class OrderFulfillmentFlow {
 
     public boolean canOpenVendorQueue() {
         new AuthFlow(driver).loginAs(Role.VENDOR);
-        VendorOrdersPage vendorOrdersPage = new VendorOrdersPage(driver);
-        vendorOrdersPage.open();
-        return vendorOrdersPage.isDisplayed() && vendorOrdersPage.hasQueueState();
+        VendorQueuePage vendorQueuePage = new VendorQueuePage(driver);
+        vendorQueuePage.open();
+        return vendorQueuePage.hasImplementedQueueState();
     }
 }

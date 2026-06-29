@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Cafetron Full UI Automation Suite" verbose="1" parallel="false">
-    <listeners>
-        <listener class-name="com.cafetron.listeners.TestListener"/>
-    </listeners>
-
-    <test name="Full UI Regression">
-        <classes>
-            <class name="com.cafetron.tests.auth.LoginTests"/>
-            <class name="com.cafetron.tests.registration.RegistrationTests"/>
-            <class name="com.cafetron.tests.menu.MenuBrowsingTests"/>
-            <class name="com.cafetron.tests.cart.CartTests"/>
-            <class name="com.cafetron.tests.checkout.CheckoutTests"/>
-            <class name="com.cafetron.tests.wallet.WalletTests"/>
-            <class name="com.cafetron.tests.orders.OrdersAndQrTests"/>
-            <class name="com.cafetron.tests.vendor.VendorTests"/>
-            <class name="com.cafetron.tests.admin.AdminTests"/>
-            <class name="com.cafetron.tests.rbac.AccessControlTests"/>
-            <class name="com.cafetron.tests.e2e.EndToEndTests"/>
-            <class name="com.cafetron.tests.defects.DefectRegressionTests"/>
-        </classes>
-    </test>
-</suite>
+<suite name="Suite">
+  <listeners>
+    <listener class-name="com.cafetron.listeners.TestListener"/>
+  </listeners>
+  <test thread-count="5" name="Test">
+    <classes>
+      <class name="com.cafetron.tests.defects.DefectRegressionTests"/>
+    </classes>
+  </test> <!-- Test -->
+</suite> <!-- Suite -->

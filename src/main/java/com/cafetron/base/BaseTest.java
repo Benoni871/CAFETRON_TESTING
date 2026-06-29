@@ -1,14 +1,17 @@
 package com.cafetron.base;
 
 import com.cafetron.config.ConfigReader;
+import com.cafetron.listeners.TestListener;
 import com.cafetron.utilities.ScreenshotUtils;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.ITestResult;
+import org.testng.annotations.Listeners;
 
 import java.lang.reflect.Method;
 
+@Listeners(TestListener.class)
 public abstract class BaseTest {
 
     @BeforeMethod(alwaysRun = true)

@@ -1,5 +1,6 @@
 package com.cafetron.utilities;
 
+import com.cafetron.reports.ExtentReportManager;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -27,7 +28,7 @@ public final class ScreenshotUtils {
             String fileName = sanitize(screenshotName) + "_" + LocalDateTime.now().format(TIMESTAMP_FORMAT) + ".png";
             Path destination = SCREENSHOT_DIR.resolve(fileName);
             Files.copy(sourceFile.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
-            return Path.of("..", "Screenshots", fileName).toString().replace("\\", "/");
+            return ExtentReportManager.getReportDirectory().relativize(destination).toString().replace("\\", "/");
         } catch (IOException | RuntimeException exception) {
             throw new IllegalStateException("Unable to capture screenshot", exception);
         }
